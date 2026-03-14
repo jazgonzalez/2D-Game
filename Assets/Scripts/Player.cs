@@ -50,4 +50,13 @@ public class Player : MonoBehaviour
         //checks if the gorundcheck circle is overlapping with any ground layer
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, groundLayer);
     }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        //if the player collided with the collectible
+        if(collision.transform.CompareTag("Collectible"));
+        {
+            Destroy(collision.gameObject); //destroy the collectible
+        }
+    }
 }
