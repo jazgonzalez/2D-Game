@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 
 public class Player : MonoBehaviour
 {
@@ -13,6 +14,9 @@ public class Player : MonoBehaviour
 
     public LayerMask groundLayer; //determine what objects are "ground"
     private Animator animator; //animation variable
+    //UI VARIABLES
+    private int collectibles;
+    public TMP_Text textCollectibles;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -54,9 +58,11 @@ public class Player : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         //if the player collided with the collectible
-        if(collision.transform.CompareTag("Collectible"));
+        if(collision.transform.CompareTag("Collectible"))
         {
             Destroy(collision.gameObject); //destroy the collectible
+            collectibles++; //counter for the collectibles
+            textCollectibles.text = collectibles.ToString(); //convert from int to string to visualize
         }
     }
 }
