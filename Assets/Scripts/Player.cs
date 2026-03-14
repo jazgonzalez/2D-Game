@@ -1,6 +1,6 @@
 using UnityEngine;
 using TMPro;
-
+using UnityEngine.SceneManagement;
 public class Player : MonoBehaviour
 {
     public float speed = 5;
@@ -54,7 +54,7 @@ public class Player : MonoBehaviour
         //checks if the gorundcheck circle is overlapping with any ground layer
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, groundLayer);
     }
-
+    //character collision with ojects
     private void OnTriggerEnter2D(Collider2D collision)
     {
         //if the player collided with the collectible
@@ -63,6 +63,11 @@ public class Player : MonoBehaviour
             Destroy(collision.gameObject); //destroy the collectible
             collectibles++; //counter for the collectibles
             textCollectibles.text = collectibles.ToString(); //convert from int to string to visualize
+        }
+        //if the player collided with the bomb
+        if(collision.transform.CompareTag("Bombs"))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name); //reinitialice the game
         }
     }
 }
