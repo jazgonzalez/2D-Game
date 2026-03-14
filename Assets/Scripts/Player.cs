@@ -1,0 +1,47 @@
+using UnityEngine;
+
+public class Player : MonoBehaviour
+{
+    public float speed = 5;
+    private Rigidbody2D rb2D; //para modificar la fisica del jugador
+    private float move;
+    //variables for jumping
+    public float jumpForce = 4; //upward force
+    private bool isGrounded; //check if the player is currently touching the ground
+    public Transform groundCheck; //reference to a point at the player's feet to check for ground
+    public float groundRadius=0.1f; //radius of the circle to detect ground
+
+    public LayerMask groundLayer; //determine what objects are "ground"
+    private Animator animator; //animation variable
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {
+        //initialization of variables
+        rb2D = GetComponent<Rigidbody2D>(); 
+        animator = GetComponent<Animator>(); 
+    }
+    
+
+    // Update is called once per frame
+    void Update()
+    {
+        move= Input.GetAxisRaw("Horizontal");
+        rb2D.linearVelocity = new Vector2(move*speed, rb2D.linearVelocity.y); //vector 2 D (horizontal,vertical)
+
+        //flip the character based on movement on the x-direction
+        if(move != 0)
+            transform.localScale = new Vector3(Mathf.Sign(move),1,1);
+        
+        //jump if we use the space button when we are on the ground
+        if(Input.GetButtonDown("Jump") && isGrounded)
+        {
+            rb2D.linearVelocity = new Vector2(rb2D.linearVelocity.x, jumpForce); //only modify the y direction to jump
+        }
+    }
+
+    void FixedUpdate()
+    {
+        //checks if the gorundcheck circle is overlapping with any ground layer
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, groundLayer);
+    }
+}
