@@ -37,6 +37,12 @@ public class Player : MonoBehaviour
         {
             rb2D.linearVelocity = new Vector2(rb2D.linearVelocity.x, jumpForce); //only modify the y direction to jump
         }
+        // Send the movement value to the Animator. 
+        // Mathf.Abs ensures the value is always positive so the "Run" animation triggers 
+        // regardless of moving left or right.
+        animator.SetFloat("Speed", Mathf.Abs(move));
+        animator.SetFloat("VerticalVelocity", rb2D.linearVelocity.y); //track jumping or falling
+        animator.SetBool("IsGrounded",isGrounded);
     }
 
     void FixedUpdate()
