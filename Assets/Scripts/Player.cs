@@ -69,5 +69,28 @@ public class Player : MonoBehaviour
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().name); //reinitialice the game
         }
+
+        //if the player touches the barrel
+        if(collision.transform.CompareTag("Barrel"))
+        {
+            // Calculate the direction of the knockback by getting the vector from the collision point to the player
+            Vector2 knockbackDir = (rb2D.position - (Vector2)collision.transform.position).normalized;   
+            rb2D.linearVelocity = Vector2.zero;
+            // Apply an immediate physical impulse to push the player away from the barrel
+            rb2D.AddForce(knockbackDir*3,ForceMode2D.Impulse);
+            //get all box colliders attached to the barrel
+            BoxCollider2D[] colliders = collision.gameObject.GetComponents<BoxCollider2D>();
+            //Loop through each collider and disable it to prevent further collisions while the barrel is being destroyed
+            foreach (BoxCollider2D col in colliders)
+            {
+                col.enabled =false;
+            }
+            // Enable the Animator component to play the barrel's destruction or interaction animation
+            collision.GetComponent<Animator>().enabled=true;
+            //destroy the barrel after 0.5s
+            Destroy(collision.gameObject,0.5f);
+
+        }
+
     }
 }
