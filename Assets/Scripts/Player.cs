@@ -17,6 +17,11 @@ public class Player : MonoBehaviour
     //UI VARIABLES
     private int collectibles;
     public TMP_Text textCollectibles;
+
+    //AUDIO VARIABLES
+    public AudioSource audioSource;
+    public AudioClip collectibleClip;
+    public AudioClip  barrelClip; 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -60,6 +65,8 @@ public class Player : MonoBehaviour
         //if the player collided with the collectible
         if(collision.transform.CompareTag("Collectible"))
         {
+            //play a sound when it touches the strawberry
+            audioSource.PlayOneShot(collectibleClip);
             Destroy(collision.gameObject); //destroy the collectible
             collectibles++; //counter for the collectibles
             textCollectibles.text = collectibles.ToString(); //convert from int to string to visualize
@@ -73,6 +80,8 @@ public class Player : MonoBehaviour
         //if the player touches the barrel
         if(collision.transform.CompareTag("Barrel"))
         {
+            //play a sound when it jumps
+            audioSource.PlayOneShot(barrelClip);
             // Calculate the direction of the knockback by getting the vector from the collision point to the player
             Vector2 knockbackDir = (rb2D.position - (Vector2)collision.transform.position).normalized;   
             rb2D.linearVelocity = Vector2.zero;
