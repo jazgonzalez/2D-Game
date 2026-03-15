@@ -1,6 +1,8 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
 public class Player : MonoBehaviour
 {
     public float speed = 5;
@@ -22,6 +24,11 @@ public class Player : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip collectibleClip;
     public AudioClip  barrelClip; 
+
+    //HEARTS VARIABLES
+    public int lives =3; //number of lives
+    public Image[] heartImages; //heart images
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -54,6 +61,14 @@ public class Player : MonoBehaviour
         animator.SetBool("IsGrounded",isGrounded);
     }
 
+    //upate number of lives
+    void updateHearts()
+    {
+        if(lives >=0 && lives< heartImages.Length)
+        {
+            heartImages[lives].enabled =false; //disabled the image of the heart
+        }
+    }
     void FixedUpdate()
     {
         //checks if the gorundcheck circle is overlapping with any ground layer
@@ -74,7 +89,13 @@ public class Player : MonoBehaviour
         //if the player collided with the bomb
         if(collision.transform.CompareTag("Bombs"))
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name); //reinitialice the game
+            lives--;
+            updateHearts();
+            if (lives<= 0)
+            {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().name); //reinitialice the game
+            }
+            
         }
 
         //if the player touches the barrel
@@ -97,7 +118,7 @@ public class Player : MonoBehaviour
             // Enable the Animator component to play the barrel's destruction or interaction animation
             collision.GetComponent<Animator>().enabled=true;
             //destroy the barrel after 0.5s
-            Destroy(collision.gameObject,0.5f);
+            Destroy(collision.gameObject,0.6f);
 
         }
 
