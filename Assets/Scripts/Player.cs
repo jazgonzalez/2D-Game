@@ -74,6 +74,12 @@ public class Player : MonoBehaviour
         //checks if the gorundcheck circle is overlapping with any ground layer
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, groundLayer);
     }
+    // Helper function called by "Invoke" to reload the current scene
+    void RestartLevel()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
     //character collision with ojects
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -86,16 +92,28 @@ public class Player : MonoBehaviour
             collectibles++; //counter for the collectibles
             textCollectibles.text = collectibles.ToString(); //convert from int to string to visualize
         }
-        //if the player collided with the bomb
-        if(collision.transform.CompareTag("Bombs"))
+        //if the player collided with the spike
+        if(collision.transform.CompareTag("Spike") )
         {
             lives--;
-            updateHearts();
-            if (lives<= 0)
+            //update the UI
+            if (lives>0 && lives < heartImages.Length)
             {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().name); //reinitialice the game
+                heartImages[lives].enabled = false;
             }
+            //if the player still has lives
+            if (lives>0)
+            {
+                animator.SetTrigger("Hurt"); //activates the hurt animation
             
+            }
+            //if the player has no lives
+            else
+            {
+                animator.SetTrigger("Die"); //activates the die animation
+                // Delay restart by 1 second so the animation can be seen
+                Invoke("RestartLevel", 1f);
+            }
         }
 
         //if the player touches the barrel
@@ -120,6 +138,15 @@ public class Player : MonoBehaviour
             //destroy the barrel after 0.5s
             Destroy(collision.gameObject,0.6f);
 
+        }
+
+        //if the player touches the floor
+        if(collision.transform.CompareTag("DeathZone") || collision.transform.CompareTag("Enemy"))
+        {
+            //triggers death animation
+            animator.SetTrigger("Die");
+           // Quick restart after falling
+            Invoke("RestartLevel", 0.5f);
         }
 
     }
