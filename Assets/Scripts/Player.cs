@@ -116,6 +116,34 @@ public class Player : MonoBehaviour
             }
         }
 
+        //if the player touches the bomb
+        if(collision.transform.CompareTag("Bombs"))
+        {
+        
+            collision.enabled = false;
+            // activates the bomb
+            Animator bombAnim = collision.GetComponent<Animator>();
+            bombAnim.SetTrigger("explode"); 
+            lives--;
+            if (lives >= 0 && lives < heartImages.Length)
+            {
+                heartImages[lives].enabled = false;
+            }
+
+            if (lives > 0)
+            {
+                animator.SetTrigger("Hurt");
+            }
+            else
+            {
+                animator.SetTrigger("Die");
+                Invoke("RestartLevel", 1f);
+            }
+
+            //destroy the bomb
+            Destroy(collision.gameObject, 0.5f); 
+        }
+
         //if the player touches the barrel
         if(collision.transform.CompareTag("Barrel"))
         {
