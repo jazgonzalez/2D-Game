@@ -4,40 +4,65 @@ public class EnemyPatrol : MonoBehaviour
 {
     public Transform pointA;
     public Transform pointB;
-    public float speed=2f;
-    private Transform currentTarget;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public float speed = 2f;
+    
+    private float targetX; // The specific X coordinate we are moving towards
+    private float posXA;   // Fixed X position for Point A
+    private float posXB;   // Fixed X position for Point B
+    private bool movingToB = true;
+
     void Start()
     {
-        //the enemy starts moving towards B
-        currentTarget=pointB;
+        // Capture the initial world positions so they don't "move" with the enemy
+        if (pointA != null && pointB != null)
+        {
+            posXA = pointA.position.x;
+            posXB = pointB.position.x;
+        }
+        else 
+        {
+            Debug.LogError("Please assign Point A and Point B in the Inspector!");
+        }
+
+        // Set the first target coordinate
+        targetX = posXB;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        //move the enemy towards the current target
-        transform.position = Vector2.MoveTowards(transform.position,currentTarget.position, speed*Time.deltaTime);
-        //check if the enemy reach point B
-        if(Vector2.Distance(transform.position,currentTarget.position) < 0.1f)
+        // Move only on the X axis towards the target coordinate
+        float step = speed * Time.deltaTime;
+        transform.position = Vector2.MoveTowards(transform.position, new Vector2(targetX, transform.position.y), step);
+
+        // Check if the enemy reached the target X coordinate
+        if (Mathf.Abs(transform.position.x - targetX) < 0.1f)
         {
-            //switch targets
-            if(currentTarget == pointB)
+            // Switch target coordinate
+            if (movingToB)
             {
-                currentTarget = pointA;
-                Flip(180f); //face left
+                targetX = posXA;
+                movingToB = false;
             }
-            //if it didnt reach the target b
             else
             {
-                currentTarget = pointB;
-                Flip(0f); // Face right
+                targetX = posXB;
+                movingToB = true;
             }
         }
+
+        // Face the correct direction based on the current target
+        HandleFlip();
     }
-    void Flip(float rotationY)
+
+    void HandleFlip()
     {
-        // Rotate the enemy to face the correct direction
-        transform.eulerAngles = new Vector3(0, rotationY, 0);
+        if (targetX > transform.position.x)
+        {
+            transform.eulerAngles = new Vector3(0, 0, 0); // Face right
+        }
+        else
+        {
+            transform.eulerAngles = new Vector3(0, 180, 0); // Face left
+        }
     }
 }
