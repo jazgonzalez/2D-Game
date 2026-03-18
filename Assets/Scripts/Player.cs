@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.Diagnostics;
 
 public class Player : MonoBehaviour
 {
@@ -24,6 +25,7 @@ public class Player : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip collectibleClip;
     public AudioClip  barrelClip; 
+    public AudioClip hitClip;
 
     //HEARTS VARIABLES
     public int lives =3; //number of lives
@@ -84,17 +86,29 @@ public class Player : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         //if the player collided with the collectible
-        if(collision.transform.CompareTag("Collectible"))
+        if (collision.transform.CompareTag("Collectible"))
         {
-            //play a sound when it touches the strawberry
             audioSource.PlayOneShot(collectibleClip);
-            Destroy(collision.gameObject); //destroy the collectible
-            collectibles++; //counter for the collectibles
-            textCollectibles.text = collectibles.ToString(); //convert from int to string to visualize
+            collectibles++; 
+            textCollectibles.text = collectibles.ToString();
+
+            // 1. NOTIFY THE MANAGER FIRST (While the fruit still exists in the scene)
+            Levels levelManager = FindFirstObjectByType<Levels>(); 
+            if (levelManager != null)
+            {
+                levelManager.CheckLevelProgress();
+            }
+
+            // 2. DESTROY AFTER NOTIFYING
+            Destroy(collision.gameObject); 
         }
+
+        
         //if the player collided with the spike
         if(collision.transform.CompareTag("Spike") )
         {
+            // Play the hit sound once
+            audioSource.PlayOneShot(hitClip);
             lives--;
             //update the UI
             if (lives>0 && lives < heartImages.Length)
@@ -119,7 +133,8 @@ public class Player : MonoBehaviour
         //if the player touches the bomb
         if(collision.transform.CompareTag("Bombs"))
         {
-        
+            // Play the hit sound once
+            audioSource.PlayOneShot(hitClip,0.1f);
             collision.enabled = false;
             // activates the bomb
             Animator bombAnim = collision.GetComponent<Animator>();
@@ -171,6 +186,8 @@ public class Player : MonoBehaviour
         //if the player touches the floor
         if(collision.transform.CompareTag("DeathZone") || collision.transform.CompareTag("Enemy"))
         {
+            // Play the hit sound once
+            audioSource.PlayOneShot(hitClip, 0.1f);
             //triggers death animation
             animator.SetTrigger("Die");
            // Quick restart after falling
